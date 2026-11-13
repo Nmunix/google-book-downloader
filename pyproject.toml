@@ -1,0 +1,125 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "google-book-downloader"
+version = "2.0.0"
+description = "Download the pages of a Google Books preview as images or a PDF."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "aprikyan" }]
+keywords = ["google-books", "scraper", "selenium", "webdriver-bidi", "pdf"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP :: Browsers",
+    "Topic :: Utilities",
+]
+
+# Runtime dependencies, all on their current stable line (Nov 2026).
+dependencies = [
+    # Drives the browser. >=4.45 is the first line with the WebDriver BiDi
+    # network module used here: event subscriptions give us the image
+    # requests without selenium-wire or CDP. Selenium Manager also ships
+    # inside this package and downloads the matching ChromeDriver /
+    # GeckoDriver by itself, so no 24 MB driver.exe lives in this repo.
+    "selenium>=4.45,<5",
+    # HTTP client for the image downloads: pooled connections, real timeouts.
+    "httpx>=0.28,<1",
+    # Terminal UI: progress bars, tables, prompts.
+    "rich>=13.8,<16",
+    # CLI framework (built on click); reads types from annotations.
+    "typer>=0.19,<1",
+    # Image sniffing, orientation and PDF assembly.
+    "pillow>=11,<14",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.2",
+    "pytest-cov>=7",
+    "ruff>=0.17",
+    "pre-commit>=4.7",
+]
+
+[project.scripts]
+gbd = "google_book_downloader.cli:entry"
+google-book-downloader = "google_book_downloader.cli:entry"
+
+[project.urls]
+Homepage = "https://github.com/Nmunix/google-book-downloader"
+Issues = "https://github.com/Nmunix/google-book-downloader/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/google_book_downloader"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "README.md", "pyproject.toml"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+branch = true
+source = ["google_book_downloader"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "BLE", # flake8-blind-except
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "RET", # flake8-return
+    "ARG", # flake8-unused-arguments
+    "PTH", # flake8-use-pathlib
+    "RUF", # ruff-specific rules
+]
+ignore = [
+    "E501",   # line length is handled by the formatter
+    "RUF001", # ambiguous unicode in strings is intentional in the UI
+    # StrEnum is 3.11+, and 3.10 is still widely deployed.
+    "UP042",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ARG", "BLE"]
+# Exception names read better without a redundant suffix.
+"src/google_book_downloader/errors.py" = ["N818"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_unreachable = true
+pretty = true
+files = ["src/google_book_downloader"]

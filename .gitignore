@@ -1,2 +1,39 @@
+# Byte-compiled / optimised / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Packaging and build artefacts
+*.egg-info/
+.eggs/
+build/
+dist/
+wheelhouse/
+*.whl
+
+# Test, coverage and type-checker caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Local scrapes, backups and output
+Backup of *.txt
+*.gbd.json
+google-books-downloader_crash.log
 google-books-downloader crash.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
